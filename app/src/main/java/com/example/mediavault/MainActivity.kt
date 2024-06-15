@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mediavault.ui.model.ConverterViewModel.ConverterViewModel
 import com.example.mediavault.ui.model.HomeViewModel.HomeViewModel
@@ -57,8 +56,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
             val homeViewModel = hiltViewModel<HomeViewModel>()
             val youtubeViewModel = hiltViewModel<YoutubeViewModel>()
             val items = listOf(

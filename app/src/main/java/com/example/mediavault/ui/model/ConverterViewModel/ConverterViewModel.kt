@@ -27,7 +27,7 @@ class ConverterViewModel @Inject constructor(
 
     private val externalDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
     private val yourFolderName = "MediaVaultDownloads" // Replace with the desired folder name
-    val folder = File(externalDir, yourFolderName)
+    private val folder = File(externalDir, yourFolderName)
 
     fun onEvent(event : ConverterUIEvent){
         when(event){
@@ -87,6 +87,7 @@ class ConverterViewModel @Inject constructor(
 
     private fun videoToGif(uri: Uri,isdefault:Boolean,startFrom:String?,trim:String?,fps:String?): Int {
         val path = getRealPath(uri)
+        createFolder()
         val outputPath =
             folder.absolutePath + "/" + getNameFromUri(uri)?.let { replaceExtension(it, "gif") }
         Config.enableLogCallback { message ->
@@ -106,6 +107,7 @@ class ConverterViewModel @Inject constructor(
 
     private fun videoToAudio(uri:Uri):Int{
         val path = getRealPath(uri)
+        createFolder()
         val outputPath =
             folder.absolutePath + "/" + getNameFromUri(uri)?.let { replaceExtension(it, "mp3") }
         Config.enableLogCallback { message ->
@@ -135,6 +137,13 @@ class ConverterViewModel @Inject constructor(
                 isExecuting = false,
                 executionStatus = result
             )
+        }
+    }
+
+    //if folder not exists create it
+    private fun createFolder(){
+        if(!folder.exists() || !folder.isDirectory()){
+            folder.mkdir()
         }
     }
 }

@@ -74,3 +74,7 @@ def downloadPlaylist(url,folder_path):
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
+
+def getMetaData(url):
+    yt = YouTube(url)
+    return [yt.title,yt.thumbnail_url,yt.author,yt.views]

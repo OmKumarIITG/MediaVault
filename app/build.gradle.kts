@@ -113,4 +113,7 @@ dependencies {
 
     //extended icon pack
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
+
+    //coil for displaying images using url
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }

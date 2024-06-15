@@ -4,6 +4,7 @@ data class YoutubeUIState(
     val url : String = "",
     val isFetchingStreams : Boolean = false,
     //for single video
+    val metadata : VideoMetadata = VideoMetadata() ,
     val streams : Set<Stream> = emptySet(),
     val streamToDownload : Stream = Stream(),
     //for playlist
@@ -21,4 +22,11 @@ data class Stream(
     val fps :String = "N/A",
     val codec : String = "N/A",
     val isSelected:Boolean = false
+)
+
+data class VideoMetadata(
+    val title: String? = "",
+    val thumbnailUrl : String? ="",
+    val author: String?="",
+    val views : String? = "0"
 )

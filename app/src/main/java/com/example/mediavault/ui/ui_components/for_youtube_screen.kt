@@ -3,8 +3,11 @@ package com.example.mediavault.ui.ui_components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,15 +24,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.mediavault.R
 import com.example.mediavault.ui.model.YoutubeViewModel.Stream
+import com.example.mediavault.ui.model.YoutubeViewModel.VideoMetadata
 import com.example.mediavault.ui.model.YoutubeViewModel.YoutubeUiEvent
 import com.example.mediavault.ui.model.YoutubeViewModel.YoutubeViewModel
 
@@ -86,8 +98,14 @@ fun StreamList(
     val videos = streams.filter {
         it.type == 1
     }
+    val metadata = state.value.metadata
+
     val audio = streams - videos.toSet()
     LazyColumn {
+        item{
+            MetadataBlock(metadata = metadata)
+            Spacer(modifier = Modifier.height(3.dp))
+        }
         item{
             Divider(
                 thickness = 2.dp,
@@ -95,7 +113,9 @@ fun StreamList(
             )
             Text(
                 "Video Files Available",
-                modifier = Modifier.fillMaxWidth().background(Color.Blue),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Blue),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 color =  Color.White
@@ -118,7 +138,9 @@ fun StreamList(
             )
             Text(
                 "Audio Files Available",
-                modifier = Modifier.fillMaxWidth().background(Color.Blue),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Blue),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 color =  Color.White
@@ -171,7 +193,9 @@ fun StreamRow(
 @Composable
 fun Header(isVideo : Boolean = true) {
     Row (
-        modifier=Modifier.height(15.dp).background(Color.Yellow)
+        modifier= Modifier
+            .height(15.dp)
+            .background(Color.Yellow)
     ){
         Text(
             if(isVideo)"QUALITY"
@@ -214,4 +238,52 @@ fun Header(isVideo : Boolean = true) {
         thickness = 1.dp,
         color = Color.Black
     )
+}
+
+@Composable
+fun MetadataBlock(
+    metadata: VideoMetadata
+) {
+    val url = metadata.thumbnailUrl
+    val title = metadata.title
+    val author = metadata.author
+    val views = metadata.views
+
+    Column(
+        modifier = Modifier.fillMaxHeight(0.4f)
+    ){
+        Text(
+            title.toString(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = TextStyle(
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier =Modifier.padding(bottom = 2.dp).fillMaxWidth()
+        )
+        Box{
+            AsyncImage(
+                model = ImageRequest.Builder(context = LocalContext.current)
+                    .data(url)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "video_desc",
+                contentScale = ContentScale.Inside, //to fill whole screen vertically and horizontally both
+                error = painterResource(id = R.drawable.ic_broken_image),//in case image failed to load
+                placeholder = painterResource(id = R.drawable.loading_img)//while its loaded , its shown
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Text("Channel: ${author.toString()}")
+            Text("Views: ${views.toString()}")
+        }
+    }
+
 }

@@ -37,21 +37,27 @@ class YoutubeViewModel @Inject constructor(
                 viewModelScope.launch (Dispatchers.IO){
                     //if its not a playlist run showStreams function
                     if(!isPlaylist((event.url))){
-                        //clear any playlist stored
+                        //clear any playlist stored and clear any metadata
                         _uiState.value = uiState.value.copy(
-                            playlistVideos = emptyList()
+                            playlistVideos = emptyList(),
+                            metadata = VideoMetadata()
                         )
                         val list = async {
                             showStreams(event.url)
                         }
+                        val metaData = async {
+                            getMetadata(event.url)
+                        }
                         _uiState.value = _uiState.value.copy(
                             streams = list.await().toSet(),
-                            isFetchingStreams = false
+                            isFetchingStreams = false,
+                            metadata = metaData.await()
                         )
                     }else{
                         //clear any stream stored
                         _uiState.value = uiState.value.copy(
-                            streams = emptySet()
+                            streams = emptySet(),
+                            metadata = VideoMetadata()
                         )
                         val videoList = async{
                             showVideosPlaylist(event.url)
@@ -173,6 +179,27 @@ class YoutubeViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.d("debugg", "exception : $e")
             false
+        }
+    }
+
+    private fun getMetadata(url: String): VideoMetadata {
+        return try {
+            val module = python.getModule("script")
+            val showVideosPlayList = module["getMetaData"]
+            val result = showVideosPlayList?.call(url)?.asList()?.mapNotNull { it.toString() } ?: emptyList()
+            if (result.size == 4) {
+                VideoMetadata(
+                    title = result[0],
+                    thumbnailUrl = result[1],
+                    author = result[2],
+                    views = result[3]
+                )
+            } else {
+                VideoMetadata()
+            }
+        } catch (e: Exception) {
+            Log.d("debugg", "exception: $e")
+            VideoMetadata()
         }
     }
 }
