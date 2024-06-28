@@ -129,7 +129,7 @@ fun StreamList(
         items(videos){video->
 
             val selectedStreamItag = state.value.streamToDownload.itag
-            StreamRow(stream = video, viewModel = viewModel,selectedStreamItag == video.itag)
+            StreamRow(stream = video, viewModel = viewModel,selectedStreamItag == video.itag,true)
         }
         item{
             Divider(
@@ -153,7 +153,7 @@ fun StreamList(
         }
         items(audio.toList()){audio->
             val selectedStreamItag = state.value.streamToDownload.itag
-            StreamRow(stream = audio, viewModel = viewModel,selectedStreamItag == audio.itag)
+            StreamRow(stream = audio, viewModel = viewModel,selectedStreamItag == audio.itag,false)
         }
 
     }
@@ -163,13 +163,15 @@ fun StreamList(
 fun StreamRow(
     stream: Stream,
     viewModel : YoutubeViewModel,
-    selected : Boolean
+    selected : Boolean,
+    isVideo : Boolean
 ) {
     Row (
         modifier= Modifier
             .fillMaxWidth()
     ){
-        Text(stream.resOrBitrate.toString()+"p",
+        val unit = if(isVideo)"p" else "kbps"
+        Text(stream.resOrBitrate.toString()+unit,
             Modifier
                 .weight(0.2f)
                 .padding(start = 5.dp, top = 15.dp))
